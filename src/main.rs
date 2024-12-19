@@ -1,6 +1,4 @@
-use std::collections::HashMap;
 use std::env;
-use std::error::Error;
 
 use task_registry::TaskRegistry;
 
@@ -15,6 +13,7 @@ fn main() {
         ("day1_task1", day1::task1),
         ("day1_task2", day1::task2),
         ("day2_task1", day2::task1),
+        ("day2_task2", day2::task2),
     ]);
 
     let task_id = match env::args().nth(1) {

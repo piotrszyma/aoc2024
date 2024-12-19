@@ -49,8 +49,7 @@ fn is_safe_v2(seq: &[i64]) -> bool {
 
     // Naive approach where we create a copy of vector with each item removed.
     for i in 0..seq.len() {
-
-        // TODO: create a wrapper over slice? with specific item hidden?
+        // TODO: operate over same slice & index instead.
         let mut a_vec = seq.to_vec();
         a_vec.remove(i);
 

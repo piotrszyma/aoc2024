@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use std::env;
+use std::error::Error;
 
 mod day1;
+mod file_utils; // Add this line
 
-type Task = fn() -> i64;
+type Task = fn() -> Result<i64, Box<dyn Error>>;
 
 struct TaskRegistry {
     tasks: HashMap<String, Task>,
@@ -37,14 +39,12 @@ impl TaskRegistry {
 }
 
 fn main() {
-    let tasks_registry = TaskRegistry::new(&[
-        ("day1_task1", day1::task1),
-        ("day1_task2", day1::task2),
-    ]);
+    let tasks_registry =
+        TaskRegistry::new(&[("day1_task1", day1::task1), ("day1_task2", day1::task2)]);
 
     let task_id = match env::args().nth(1) {
         Some(task_id) => task_id,
-        _ => tasks_registry.latest_task_id().to_string()
+        _ => tasks_registry.latest_task_id().to_string(),
     };
 
     let result = match tasks_registry.get(&task_id) {
@@ -55,5 +55,9 @@ fn main() {
         _ => panic!("Invalid task_id: {}", task_id),
     };
 
-    println!("result: {}", result)
+    if let Ok(value) = result {
+        println!("Result: {}", value);
+    } else {
+        panic!("Error: {:?}", result.unwrap_err());
+    }
 }

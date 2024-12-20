@@ -10,10 +10,10 @@ enum Op {
 }
 
 fn find_ops_in_line(haystack: &str) -> Vec<Op> {
-    let re_mul =
+    let re_op =
         Regex::new(r"mul\((?P<left_op>\d{1,3}),(?P<right_op>\d{1,3})\)|(do(n't)?\(\))").unwrap();
 
-    let captures = re_mul.captures_iter(&haystack);
+    let captures = re_op.captures_iter(&haystack);
 
     let result: Vec<_> = captures
         .map(|c| {

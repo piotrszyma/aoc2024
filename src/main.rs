@@ -16,7 +16,7 @@ fn main() {
         ("day2_task1", day2::task1),
         ("day2_task2", day2::task2),
         ("day3_task1", day3::task1),
-        // ("day3_task2", day3::task2),
+        ("day3_task2", day3::task2),
     ]);
 
     let task_id = match env::args().nth(1) {

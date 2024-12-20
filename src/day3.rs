@@ -2,12 +2,11 @@ use std::fs::read_to_string;
 
 use regex::Regex;
 
-// TODO: drop `pos` attribute.
 #[derive(Debug, PartialEq)]
 enum Op {
-    Enable { pos: usize },
-    Disable { pos: usize },
-    Mul { left: i64, right: i64, pos: usize },
+    Enable,
+    Disable,
+    Mul { left: i64, right: i64 },
 }
 
 fn find_ops_in_line(haystack: &str) -> Vec<Op> {
@@ -19,11 +18,10 @@ fn find_ops_in_line(haystack: &str) -> Vec<Op> {
     let result: Vec<_> = captures
         .map(|c| {
             let full_match = c.get(0).unwrap();
-            let start_pos = full_match.start();
 
             match full_match.as_str() {
-                "don't()" => Op::Disable { pos: start_pos },
-                "do()" => Op::Enable { pos: start_pos },
+                "don't()" => Op::Disable,
+                "do()" => Op::Enable,
                 _ => {
                     let left = c
                         .name("left_op")
@@ -33,11 +31,7 @@ fn find_ops_in_line(haystack: &str) -> Vec<Op> {
                         .name("right_op")
                         .map_or(0, |m| m.as_str().parse::<i64>().unwrap());
 
-                    Op::Mul {
-                        left,
-                        right,
-                        pos: start_pos,
-                    }
+                    Op::Mul { left, right }
                 }
             }
         })
@@ -51,11 +45,7 @@ fn task1_run(input_path: &str) -> Result<i64, Box<dyn std::error::Error>> {
     let result = find_ops_in_line(&data)
         .iter()
         .map(|v| match v {
-            Op::Mul {
-                left,
-                right,
-                pos: _,
-            } => left * right,
+            Op::Mul { left, right } => left * right,
             _ => 0,
         })
         .sum::<i64>();
@@ -71,17 +61,13 @@ fn task2_run(input_path: &str) -> Result<i64, Box<dyn std::error::Error>> {
 
     for op in ops {
         match op {
-            Op::Disable { pos: _ } => {
+            Op::Disable => {
                 enabled = false;
             }
-            Op::Enable { pos: _ } => {
+            Op::Enable => {
                 enabled = true;
             }
-            Op::Mul {
-                left,
-                right,
-                pos: _,
-            } => {
+            Op::Mul { left, right } => {
                 if enabled {
                     total += left * right
                 }
@@ -108,15 +94,10 @@ mod tests {
     fn find_op_in_line_mul_op_test() {
         assert_eq!(
             vec![
-                Op::Mul {
-                    left: 1,
-                    right: 2,
-                    pos: 0,
-                },
+                Op::Mul { left: 1, right: 2 },
                 Op::Mul {
                     left: 123,
                     right: 456,
-                    pos: 8,
                 },
             ],
             find_ops_in_line("mul(1,2)mul(123,456)")
@@ -130,26 +111,10 @@ mod tests {
         assert_eq!(Vec::<Op>::new(), find_ops_in_line("mul ( 2 , 4 )"));
         assert_eq!(
             vec![
-                Op::Mul {
-                    left: 2,
-                    right: 4,
-                    pos: 1
-                },
-                Op::Mul {
-                    left: 5,
-                    right: 5,
-                    pos: 29
-                },
-                Op::Mul {
-                    left: 11,
-                    right: 8,
-                    pos: 53
-                },
-                Op::Mul {
-                    left: 8,
-                    right: 5,
-                    pos: 62
-                },
+                Op::Mul { left: 2, right: 4 },
+                Op::Mul { left: 5, right: 5 },
+                Op::Mul { left: 11, right: 8 },
+                Op::Mul { left: 8, right: 5 },
             ],
             find_ops_in_line(
                 "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
@@ -162,14 +127,10 @@ mod tests {
         assert_eq!(Vec::<Op>::new(), find_ops_in_line("don't"));
         assert_eq!(Vec::<Op>::new(), find_ops_in_line("do"));
         assert_eq!(Vec::<Op>::new(), find_ops_in_line("dodon'tdo"));
-        assert_eq!(vec![Op::Disable { pos: 0 }], find_ops_in_line("don't()"));
-        assert_eq!(vec![Op::Enable { pos: 0 }], find_ops_in_line("do()"));
+        assert_eq!(vec![Op::Disable], find_ops_in_line("don't()"));
+        assert_eq!(vec![Op::Enable], find_ops_in_line("do()"));
         assert_eq!(
-            vec![
-                Op::Disable { pos: 0 },
-                Op::Enable { pos: 7 },
-                Op::Disable { pos: 16 }
-            ],
+            vec![Op::Disable, Op::Enable, Op::Disable],
             find_ops_in_line("don't()do()don'tdon't()")
         );
     }

@@ -19,6 +19,16 @@ fn row_chars_to_i64(rows: &Vec<String>) -> Vec<Vec<i64>> {
         .collect()
 }
 
+fn str_slice_to_i64(rows: &Vec<&str>) -> Vec<Vec<char>> {
+    rows.iter()
+        .map(|r| {
+            r.chars()
+                .into_iter()
+                .collect()
+        })
+        .collect()
+}
+
 fn find_xmas(rows: &Vec<Vec<i64>>, start: (i64, i64), diff: (i64, i64)) -> i64 {
     let mut pos = start;
     let mut expected = 1;
@@ -177,19 +187,19 @@ mod tests {
     #[test]
     fn find_needle_2d_xmas_test() {
         let rows = vec![
-            String::from("....XXMAS."),
-            String::from(".SAMXMS..."),
-            String::from("...S..A..."),
-            String::from("..A.A.MS.X"),
-            String::from("XMASAMX.MM"),
-            String::from("X.....XA.A"),
-            String::from("S.S.S.S.SS"),
-            String::from(".A.A.A.A.A"),
-            String::from("..M.M.M.MM"),
-            String::from(".X.X.XMASX"),
+            "....XXMAS.",
+            ".SAMXMS...",
+            "...S..A...",
+            "..A.A.MS.X",
+            "XMASAMX.MM",
+            "X.....XA.A",
+            "S.S.S.S.SS",
+            ".A.A.A.A.A",
+            "..M.M.M.MM",
+            ".X.X.XMASX",
         ];
 
-        assert_eq!(18, count_xmas(&row_chars_to_i64(&rows)))
+        assert_eq!(18, count_xmas(&str_slice_to_i64(&rows)))
     }
 
     #[test]

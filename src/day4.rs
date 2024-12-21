@@ -55,7 +55,7 @@ fn find_xmas(rows: &Vec<Vec<i64>>, start: (i64, i64), diff: (i64, i64)) -> i64 {
     return 1;
 }
 
-fn search_xmas(rows: &Vec<Vec<i64>>) -> i64 {
+fn count_xmas(rows: &Vec<Vec<i64>>) -> i64 {
     let mut total = 0;
 
     for (row_idx, row) in rows.iter().enumerate() {
@@ -126,13 +126,12 @@ fn find_xmas_v2(rows: &Vec<Vec<i64>>, mid: (i64, i64)) -> i64 {
     }
 }
 
-fn search_xmas_v2(rows: &Vec<Vec<i64>>) -> i64 {
+fn count_xmas_v2(rows: &Vec<Vec<i64>>) -> i64 {
     let mut total = 0;
 
     for (row_idx, row) in rows.iter().enumerate() {
         for (col_idx, cell) in row.iter().enumerate() {
             if *cell != 3i64 {
-                // A
                 continue;
             }
 
@@ -146,18 +145,21 @@ fn search_xmas_v2(rows: &Vec<Vec<i64>>) -> i64 {
     total
 }
 
-fn task1_run(path: &str) -> Result<i64, Box<dyn Error>> {
+type SearchFn = fn(&Vec<Vec<i64>>) -> i64;
+
+fn task_run(path: &str, count_fn: SearchFn) -> Result<i64, Box<dyn Error>> {
     let rows: Vec<_> = read_lines_from_file_v2(path).collect();
     let rows = row_chars_to_i64(&rows);
-    let count = search_xmas(&rows);
+    let count = count_fn(&rows);
     Ok(count)
 }
 
+fn task1_run(path: &str) -> Result<i64, Box<dyn Error>> {
+    task_run(path, count_xmas)
+}
+
 fn task2_run(path: &str) -> Result<i64, Box<dyn Error>> {
-    let rows: Vec<_> = read_lines_from_file_v2(path).collect();
-    let rows = row_chars_to_i64(&rows);
-    let count = search_xmas_v2(&rows);
-    Ok(count)
+    task_run(path, count_xmas_v2)
 }
 
 pub fn task1() -> Result<i64, Box<dyn Error>> {
@@ -187,7 +189,7 @@ mod tests {
             String::from(".X.X.XMASX"),
         ];
 
-        assert_eq!(18, search_xmas(&row_chars_to_i64(&rows)))
+        assert_eq!(18, count_xmas(&row_chars_to_i64(&rows)))
     }
 
     #[test]

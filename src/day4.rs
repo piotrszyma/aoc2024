@@ -19,16 +19,6 @@ fn row_chars_to_i64(rows: &Vec<String>) -> Vec<Vec<i64>> {
         .collect()
 }
 
-fn str_slice_to_i64(rows: &Vec<&str>) -> Vec<Vec<char>> {
-    rows.iter()
-        .map(|r| {
-            r.chars()
-                .into_iter()
-                .collect()
-        })
-        .collect()
-}
-
 fn find_xmas(rows: &Vec<Vec<i64>>, start: (i64, i64), diff: (i64, i64)) -> i64 {
     let mut pos = start;
     let mut expected = 1;
@@ -199,7 +189,12 @@ mod tests {
             ".X.X.XMASX",
         ];
 
-        assert_eq!(18, count_xmas(&str_slice_to_i64(&rows)))
+        assert_eq!(
+            18,
+            count_xmas(&row_chars_to_i64(
+                &rows.into_iter().map(|v| v.to_string()).collect()
+            ))
+        )
     }
 
     #[test]

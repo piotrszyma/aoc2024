@@ -31,6 +31,17 @@ enum Direction {
     LEFT,
 }
 
+impl Direction {
+    fn rotate(self) -> Direction {
+        match self {
+            Direction::UP => Direction::RIGHT,
+            Direction::RIGHT => Direction::DOWN,
+            Direction::DOWN => Direction::LEFT,
+            Direction::LEFT => Direction::UP,
+        }
+    }
+}
+
 struct Map {
     obstacles: HashSet<Coord>,
 
@@ -103,29 +114,16 @@ impl Guard {
 
     /// Returns new direction.
     fn rotate(&mut self) -> () {
-        self.direction = match self.direction {
-            Direction::UP => Direction::RIGHT,
-            Direction::RIGHT => Direction::DOWN,
-            Direction::DOWN => Direction::LEFT,
-            Direction::LEFT => Direction::UP,
-        }
+        self.direction = self.direction.rotate()
     }
 
     /// Makes a step, returns next position.
     fn step(&mut self, map: &Map) -> () {
         let mut next_position = self.next_position();
 
-        let mut turns = 0;
-
         while map.has_obstacle(&next_position) {
             self.rotate();
             next_position = self.next_position();
-
-            turns += 1;
-
-            if turns > 4 {
-                panic!("cannot leave")
-            }
         }
 
         self.position = next_position

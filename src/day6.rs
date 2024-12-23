@@ -187,18 +187,17 @@ fn task2_run(path: &str) -> Result<i64, Box<dyn Error>> {
         map.add_obstacle(coord_visited);
 
         let mut guard = Guard::new(guard.start_position);
-        let mut visited: HashSet<(Coord, Direction)> = HashSet::new(); // tracks position with current direction
+        let mut route_len = 0; // cycle detector
 
         while map.is_on_map(&guard.position) {
             guard.step(&map);
 
-            let directed_position = (guard.position, guard.direction);
+            route_len += 1;
 
-            if visited.contains(&directed_position) {
+            if route_len > 2 * map.max_x * map.max_y {
+                // if route len is > 2XY then it must be a cycle
                 cycles_count += 1;
                 break;
-            } else {
-                visited.insert(directed_position);
             }
         }
 

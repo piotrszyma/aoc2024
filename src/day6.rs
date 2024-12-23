@@ -23,6 +23,7 @@ impl fmt::Display for Coord {
     }
 }
 
+#[derive(Eq, Hash, PartialEq, Copy, Clone)]
 enum Direction {
     UP,
     RIGHT,
@@ -77,6 +78,7 @@ impl Map {
 
 struct Guard {
     position: Coord,
+    start_position: Coord,
     direction: Direction,
 }
 
@@ -84,6 +86,7 @@ impl Guard {
     fn new(start_position: Coord) -> Self {
         Guard {
             position: start_position,
+            start_position,
             direction: Direction::UP,
         }
     }
@@ -112,9 +115,17 @@ impl Guard {
     fn step(&mut self, map: &Map) -> () {
         let mut next_position = self.next_position();
 
+        let mut turns = 0;
+
         while map.has_obstacle(&next_position) {
             self.rotate();
             next_position = self.next_position();
+
+            turns += 1;
+
+            if turns > 4 {
+                panic!("cannot leave")
+            }
         }
 
         self.position = next_position
@@ -163,15 +174,48 @@ fn task1_run(path: &str) -> Result<i64, Box<dyn Error>> {
 
 fn task2_run(path: &str) -> Result<i64, Box<dyn Error>> {
     let lines = read_lines_from_file_v2(path);
-    todo!()
+    let (mut guard, mut map) = lines_into_guard_and_map(lines)?;
+
+    let mut visited: HashSet<Coord> = HashSet::new();
+
+    while map.is_on_map(&guard.position) {
+        visited.insert(guard.position);
+        guard.step(&map);
+    }
+
+    let mut cycles_count = 0;
+
+    for coord_visited in visited {
+        map.add_obstacle(coord_visited);
+
+        let mut guard = Guard::new(guard.start_position);
+        let mut visited: HashSet<(Coord, Direction)> = HashSet::new(); // tracks position with current direction
+
+        while map.is_on_map(&guard.position) {
+            guard.step(&map);
+
+            let directed_position = (guard.position, guard.direction);
+
+            if visited.contains(&directed_position) {
+                cycles_count += 1;
+                break;
+            } else {
+                visited.insert(directed_position);
+            }
+        }
+
+        map.remove_obstacle(coord_visited);
+    }
+
+    Ok(cycles_count)
 }
 
 pub fn task1() -> Result<i64, Box<dyn Error>> {
-    task1_run("data/day5_test.txt")
+    task1_run("data/day6_test.txt")
 }
 
 pub fn task2() -> Result<i64, Box<dyn Error>> {
-    task2_run("data/day5_test.txt")
+    task2_run("data/day6.txt")
 }
 
 #[cfg(test)]

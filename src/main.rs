@@ -7,6 +7,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 mod file_utils;
 mod task_registry;
@@ -23,6 +24,8 @@ fn main() {
         ("day4_task2", day4::task2),
         ("day5_task1", day5::task1),
         ("day5_task2", day5::task2),
+        ("day6_task1", day6::task1),
+        ("day6_task2", day6::task2),
     ]);
 
     let task_id = match env::args().nth(1) {
